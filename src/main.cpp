@@ -1,5 +1,6 @@
 #include <sil/sil.hpp>
 #include "random.hpp"
+#include <cmath>
 
 void keep_green_only(sil::Image &image)
 {
@@ -65,7 +66,8 @@ void mirror(sil::Image &image)
     }
 }
 
-void noise(sil::Image &image){
+void noise(sil::Image &image)
+{
     // nombre de boucle aléatoire
     // x et y aléatoire
     int loop = random_int(image.width(), image.width() * image.height());
@@ -81,7 +83,8 @@ void noise(sil::Image &image){
     }
 }
 
-sil::Image rotate(sil::Image &image){
+sil::Image rotate(sil::Image &image)
+{
     sil::Image new_image{image.height(), image.width()};
 
     // Avec autre fonction
@@ -94,28 +97,29 @@ sil::Image rotate(sil::Image &image){
     // }
     // mirror(new_image);
 
-    //Tourné vers la droite
-    // for (int x{0}; x < image.width(); x++)
-    // {
-    //     for (int y{0}; y < image.height(); y++)
-    //     {
-    //         new_image.pixel(y, (image.width() - (x + 1))) = image.pixel(x,y);
-    //     }
-    // }
+    // Tourné vers la droite
+    //  for (int x{0}; x < image.width(); x++)
+    //  {
+    //      for (int y{0}; y < image.height(); y++)
+    //      {
+    //          new_image.pixel(y, (image.width() - (x + 1))) = image.pixel(x,y);
+    //      }
+    //  }
 
-    //Tourner vers la gauche
+    // Tourner vers la gauche
     for (int x{0}; x < image.width(); x++)
     {
         for (int y{0}; y < image.height(); y++)
         {
-            new_image.pixel(new_image.width() - (y + 1), new_image.height() - ((image.width() - (x + 1))+ 1)) = image.pixel(x,y);
+            new_image.pixel(new_image.width() - (y + 1), new_image.height() - ((image.width() - (x + 1)) + 1)) = image.pixel(x, y);
         }
     }
     return new_image;
 }
 
-//A REVOIR
-void rgb_split(sil::Image &image){
+// A REVOIR
+void rgb_split(sil::Image &image)
+{
     sil::Image imageRef = image;
 
     for (int x{0}; x < image.width(); x++)
@@ -125,32 +129,68 @@ void rgb_split(sil::Image &image){
             if (x - 30 >= 0)
             {
                 image.pixel(x, y).r = imageRef.pixel(x - 30, y).r;
-            }else{
+            }
+            else
+            {
                 image.pixel(x, y).r = imageRef.pixel(0, y).r;
             }
-            
-            if(x + 30 < image.width() - 1){
+
+            if (x + 30 < image.width() - 1)
+            {
                 image.pixel(x, y).b = imageRef.pixel(x + 30, y).b;
             }
         }
     }
 }
 
-void brightness(sil::Image &image){
+void brightness(sil::Image &image)
+{
 
-    //Eclaircissement
+    // Eclaircissement
+    // for (glm::vec3 &color : image.pixels())
+    // {
+    //     float a = 0.7f;
+    //     color.r = std::pow(color.r, a);
+    //     color.g = std::pow(color.g, a);
+    //     color.b = std::pow(color.b, a);
+    // }
 
-    //Assombrissement
+    // Assombrissement
+     for (glm::vec3 &color : image.pixels())
+     {
+         float a = 1.3f;
+         color.r = std::pow(color.r, a);
+         color.g = std::pow(color.g, a);
+         color.b = std::pow(color.b, a);
+     }
+}
 
+void disque(sil::Image &image){
+    float rayon = image.width()*10;
+
+    for (int x{0}; x < image.width(); x++)
+    {
+        for (int y{0}; y < image.height(); y++){
+            if (std::pow((x - image.width()/2), 2) + std::pow((y - image.height()/2), 2) <= rayon)
+            {
+                image.pixel(x, y).r = 1.f;
+                image.pixel(x, y).g = 1.f;
+                image.pixel(x, y).b = 1.f;
+            }
+        }
+    }
 }
 
 int main()
 {
-    // sil::Image image{300 /*width*/, 200 /*height*/};
+    //sil::Image image{300 /*width*/, 200 /*height*/};
     // gradient(image);
 
-    //rotate(image).save("output/test.png");
-    sil::Image image{"images/photo.jpg"};
-    rgb_split(image);
+    sil::Image image{500 /*width*/, 500 /*height*/};
+    disque(image);
+
+    // rotate(image).save("output/test.png");
+    // sil::Image image{"images/photo.jpg"};
+    // brightness(image);
     image.save("output/test.png");
 }
