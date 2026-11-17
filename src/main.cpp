@@ -156,22 +156,24 @@ void brightness(sil::Image &image)
     // }
 
     // Assombrissement
-     for (glm::vec3 &color : image.pixels())
-     {
-         float a = 1.3f;
-         color.r = std::pow(color.r, a);
-         color.g = std::pow(color.g, a);
-         color.b = std::pow(color.b, a);
-     }
+    for (glm::vec3 &color : image.pixels())
+    {
+        float a = 1.3f;
+        color.r = std::pow(color.r, a);
+        color.g = std::pow(color.g, a);
+        color.b = std::pow(color.b, a);
+    }
 }
 
-void disque(sil::Image &image){
-    float rayon = image.width()*20;
+void disque(sil::Image &image)
+{
+    float rayon = image.width() * 20;
 
     for (int x{0}; x < image.width(); x++)
     {
-        for (int y{0}; y < image.height(); y++){
-            if (std::pow((x - image.width()/2), 2) + std::pow((y - image.height()/2), 2) <= rayon)
+        for (int y{0}; y < image.height(); y++)
+        {
+            if (std::pow((x - image.width() / 2), 2) + std::pow((y - image.height() / 2), 2) <= rayon)
             {
                 image.pixel(x, y).r = 1.f;
                 image.pixel(x, y).g = 1.f;
@@ -181,13 +183,15 @@ void disque(sil::Image &image){
     }
 }
 
-void circle(sil::Image &image){
-    float rayon = image.width()*20;
+void circle(sil::Image &image)
+{
+    float rayon = image.width() * 20;
     float thickness = 1000.f;
     for (int x{0}; x < image.width(); x++)
     {
-        for (int y{0}; y < image.height(); y++){
-            if (std::pow((x - image.width()/2), 2) + std::pow((y - image.height()/2), 2) >= rayon - thickness && std::pow((x - image.width()/2), 2) + std::pow((y - image.height()/2), 2) <= rayon + thickness)
+        for (int y{0}; y < image.height(); y++)
+        {
+            if (std::pow((x - image.width() / 2), 2) + std::pow((y - image.height() / 2), 2) >= rayon - thickness && std::pow((x - image.width() / 2), 2) + std::pow((y - image.height() / 2), 2) <= rayon + thickness)
             {
                 image.pixel(x, y).r = 1.f;
                 image.pixel(x, y).g = 1.f;
@@ -195,18 +199,80 @@ void circle(sil::Image &image){
             }
         }
     }
+}
+
+void animation(sil::Image &image)
+{
+    float rayon = image.width() * 20;
+    for (int i{0}; i <= image.width(); i += 5)
+    {
+        sil::Image imageRef = image;
+        for (int x{0}; x < image.width(); x++)
+        {
+            for (int y{0}; y < image.height(); y++)
+            {
+                if (std::pow((x - i), 2) + std::pow((y - image.height() / 2), 2) <= rayon)
+                {
+                    imageRef.pixel(x, y).r = 1.f;
+                    imageRef.pixel(x, y).g = 1.f;
+                    imageRef.pixel(x, y).b = 1.f;
+                }
+            }
+        }
+        imageRef.save("output/animation/animation-" + std::to_string(i) + ".png");
+    }
+}
+
+void rosace(sil::Image &image)
+{
+    int rayon = 100;
+    int thickness = 2;
+
+    for (int x{0}; x < image.width(); x++)
+    {
+        for (int y{0}; y < image.height(); y++)
+        {
+            float distance = std::pow(x - image.width() / 2, 2) + std::pow(y - image.height() / 2, 2);
+
+            if (distance >= std::pow(rayon - thickness, 2) && distance <= std::pow(rayon + thickness, 2))
+            {
+                image.pixel(x, y).r = 1.f;
+                image.pixel(x, y).g = 1.f;
+                image.pixel(x, y).b = 1.f;
+            }
+
+            for (int i{0}; i < 6; i++)
+            {
+                float angle = i * (2 * M_PI / 6);
+                float x_center = image.width() / 2 + rayon * std::cos(angle);
+                float y_center = image.height() / 2 + rayon * std::sin(angle);
+                float distance = std::pow(x - x_center, 2) + std::pow(y - y_center, 2);
+
+                if (distance >= std::pow(rayon - thickness, 2) && distance <= std::pow(rayon + thickness, 2))
+                {
+                    image.pixel(x, y).r = 1.f;
+                    image.pixel(x, y).g = 1.f;
+                    image.pixel(x, y).b = 1.f;
+                }
+            }
+        }
+    }
+}
+
+void mosaique(sil::Image &image){
+    int nbDivision = 5;
 }
 
 int main()
 {
-    //sil::Image image{300 /*width*/, 200 /*height*/};
-    // gradient(image);
+    // sil::Image image{300 /*width*/, 200 /*height*/};
+    //  gradient(image);
 
-    sil::Image image{500 /*width*/, 500 /*height*/};
-    circle(image);
+    // sil::Image image{500 /*width*/, 500 /*height*/};
+    // rosace(image);
 
     // rotate(image).save("output/test.png");
-    // sil::Image image{"images/photo.jpg"};
-    // brightness(image);
+    sil::Image image{"images/logo.png"};
+    mosaique(image);
     image.save("output/test.png");
 }
