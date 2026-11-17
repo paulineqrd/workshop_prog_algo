@@ -166,12 +166,28 @@ void brightness(sil::Image &image)
 }
 
 void disque(sil::Image &image){
-    float rayon = image.width()*10;
+    float rayon = image.width()*20;
 
     for (int x{0}; x < image.width(); x++)
     {
         for (int y{0}; y < image.height(); y++){
             if (std::pow((x - image.width()/2), 2) + std::pow((y - image.height()/2), 2) <= rayon)
+            {
+                image.pixel(x, y).r = 1.f;
+                image.pixel(x, y).g = 1.f;
+                image.pixel(x, y).b = 1.f;
+            }
+        }
+    }
+}
+
+void circle(sil::Image &image){
+    float rayon = image.width()*20;
+    float thickness = 1000.f;
+    for (int x{0}; x < image.width(); x++)
+    {
+        for (int y{0}; y < image.height(); y++){
+            if (std::pow((x - image.width()/2), 2) + std::pow((y - image.height()/2), 2) >= rayon - thickness && std::pow((x - image.width()/2), 2) + std::pow((y - image.height()/2), 2) <= rayon + thickness)
             {
                 image.pixel(x, y).r = 1.f;
                 image.pixel(x, y).g = 1.f;
@@ -187,7 +203,7 @@ int main()
     // gradient(image);
 
     sil::Image image{500 /*width*/, 500 /*height*/};
-    disque(image);
+    circle(image);
 
     // rotate(image).save("output/test.png");
     // sil::Image image{"images/photo.jpg"};
