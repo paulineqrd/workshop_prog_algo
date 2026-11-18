@@ -273,6 +273,30 @@ void mosaique(sil::Image &image){
     image = newImage;
 }
 
+void mosaique_mirror(sil::Image &image){
+    int nbDivision = 5;
+    sil::Image newImage{image.width() * nbDivision, image.height() * nbDivision};
+
+    for (int x{0}; x < newImage.width(); x++)
+    {
+        for (int y{0}; y < newImage.height(); y++){
+
+            int xOriginal = x % image.width();
+            int yOriginal = y % image.height();
+
+            int caseX = x / image.width();
+
+            if (caseX % 2 == 1){
+                xOriginal = image.width() - 1 - xOriginal;
+            }
+
+            newImage.pixel(x,y) = image.pixel(xOriginal, yOriginal);
+        }
+    }
+
+    image = newImage;
+}
+
 int main()
 {
     // sil::Image image{300 /*width*/, 200 /*height*/};
@@ -283,6 +307,6 @@ int main()
 
     // rotate(image).save("output/test.png");
     sil::Image image{"images/logo.png"};
-    mosaique(image);
+    mosaique_mirror(image);
      image.save("output/test.png");
 }
