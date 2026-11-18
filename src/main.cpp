@@ -261,6 +261,16 @@ void rosace(sil::Image &image)
 
 void mosaique(sil::Image &image){
     int nbDivision = 5;
+    sil::Image newImage{image.width() * nbDivision, image.height() * nbDivision};
+
+    for (int x{0}; x < newImage.width(); x++)
+    {
+        for (int y{0}; y < newImage.height(); y++){
+            newImage.pixel(x,y) = image.pixel(x % image.width(), y % image.height());
+        }
+    }
+
+    image = newImage;
 }
 
 int main()
@@ -274,5 +284,5 @@ int main()
     // rotate(image).save("output/test.png");
     sil::Image image{"images/logo.png"};
     mosaique(image);
-    image.save("output/test.png");
+     image.save("output/test.png");
 }
