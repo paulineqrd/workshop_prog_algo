@@ -342,6 +342,23 @@ void tri_pixels(sil::Image &image)
     });
 }
 
+void tri_lignes(sil::Image &image){
+
+
+    for(int y {0}; y < image.height(); y++){
+
+        auto begin = image.pixels().begin() + y * image.width();
+        auto end = begin + image.width();
+        std::sort(begin, end, [](glm::vec3 const& color1, glm::vec3 const& color2){
+        float luminosite1 = color1.r + color1.g + color1.b;
+        float luminosite2 = color2.r + color2.g + color2.b;
+
+        return luminosite1 < luminosite2;
+    });
+    }
+    
+}
+
 int main()
 {
     // sil::Image image{300 /*width*/, 200 /*height*/};
@@ -352,6 +369,6 @@ int main()
 
     // rotate(image).save("output/test.png");
     sil::Image image{"images/logo.png"};
-    tri_pixels(image);
+    tri_lignes(image);
     image.save("output/test.png");
 }
