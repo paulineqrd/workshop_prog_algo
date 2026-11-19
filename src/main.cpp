@@ -331,32 +331,47 @@ void glitch(sil::Image &image)
     }
 }
 
-void tri_pixels(sil::Image &image)
+float brightness(glm::vec3 color)
 {
-    std::sort(image.pixels().begin(), image.pixels().end(), [](glm::vec3 const& color1, glm::vec3 const& color2)
-    {
-        float luminosite1 = color1.r + color1.g + color1.b;
-        float luminosite2 = color2.r + color2.g + color2.b;
-
-        return luminosite1 < luminosite2;
-    });
+    float brightness = color.r + color.g + color.b;
+    return brightness;
 }
 
-void tri_lignes(sil::Image &image){
+void tri_pixels(sil::Image &image)
+{
+    std::sort(image.pixels().begin(), image.pixels().end(), [](glm::vec3 const &color1, glm::vec3 const &color2)
+              { return brightness(color1) < brightness(color2); });
+}
 
-
-    for(int y {0}; y < image.height(); y++){
+void tri_lignes(sil::Image &image)
+{
+    for (int y{0}; y < image.height(); y++)
+    {
 
         auto begin = image.pixels().begin() + y * image.width();
         auto end = begin + image.width();
-        std::sort(begin, end, [](glm::vec3 const& color1, glm::vec3 const& color2){
-        float luminosite1 = color1.r + color1.g + color1.b;
-        float luminosite2 = color2.r + color2.g + color2.b;
-
-        return luminosite1 < luminosite2;
-    });
+        std::sort(begin, end, [](glm::vec3 const &color1, glm::vec3 const &color2)
+                  { return brightness(color1) < brightness(color2); });
     }
-    
+}
+
+void random_tri(sil::Image &image)
+{
+    for (int i{0}; i < image.width(); i++)
+    {
+        int x = random_int(0, image.width());
+        int y = random_int(0, image.height());
+
+        int randomWidth = random_int(10, 30);
+
+        randomWidth = std::min(randomWidth, image.width() - x);
+
+        auto begin = image.pixels().begin() + y * image.width() + x;
+        auto end = begin + randomWidth;
+
+        std::sort(begin, end, [](glm::vec3 const &color1, glm::vec3 const &color2)
+                  { return brightness(color1) < brightness(color2); });
+    }
 }
 
 int main()
@@ -369,6 +384,6 @@ int main()
 
     // rotate(image).save("output/test.png");
     sil::Image image{"images/logo.png"};
-    tri_lignes(image);
+    random_tri(image);
     image.save("output/test.png");
 }
