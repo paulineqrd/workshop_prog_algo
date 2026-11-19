@@ -400,13 +400,30 @@ void fractale(sil::Image &image)
     }
 }
 
+void color_gradient(sil::Image &image)
+{
+    for (float x{0}; x < image.width() - 1; x++)
+    {
+        for (float y{0}; y < image.height(); y++)
+        {
+            float t = x / image.width();
+
+            image.pixel(x, y).r = 1.f - t;
+            image.pixel(x, y).g = t;
+        }
+    }
+
+    // plus, faire beau dégradé ...
+}
+
 int main()
 {
-    // sil::Image image{300 /*width*/, 200 /*height*/};
+    sil::Image image{300 /*width*/, 200 /*height*/};
+    color_gradient(image);
     //  gradient(image);
 
-    sil::Image image{500 /*width*/, 500 /*height*/};
-    fractale(image);
+    // sil::Image image{500 /*width*/, 500 /*height*/};
+    // fractale(image);
     // rosace(image);
 
     // rotate(image).save("output/test.png");
