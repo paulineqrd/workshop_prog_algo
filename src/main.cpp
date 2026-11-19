@@ -1,6 +1,7 @@
 #include <sil/sil.hpp>
 #include "random.hpp"
 #include <cmath>
+#include <algorithm>
 
 void keep_green_only(sil::Image &image)
 {
@@ -259,42 +260,86 @@ void rosace(sil::Image &image)
     }
 }
 
-void mosaique(sil::Image &image){
+void mosaique(sil::Image &image)
+{
     int nbDivision = 5;
     sil::Image newImage{image.width() * nbDivision, image.height() * nbDivision};
 
     for (int x{0}; x < newImage.width(); x++)
     {
-        for (int y{0}; y < newImage.height(); y++){
-            newImage.pixel(x,y) = image.pixel(x % image.width(), y % image.height());
+        for (int y{0}; y < newImage.height(); y++)
+        {
+            newImage.pixel(x, y) = image.pixel(x % image.width(), y % image.height());
         }
     }
 
     image = newImage;
 }
 
-void mosaique_mirror(sil::Image &image){
+void mosaique_mirror(sil::Image &image)
+{
     int nbDivision = 5;
     sil::Image newImage{image.width() * nbDivision, image.height() * nbDivision};
 
     for (int x{0}; x < newImage.width(); x++)
     {
-        for (int y{0}; y < newImage.height(); y++){
+        for (int y{0}; y < newImage.height(); y++)
+        {
 
             int xOriginal = x % image.width();
             int yOriginal = y % image.height();
 
             int caseX = x / image.width();
 
-            if (caseX % 2 == 1){
+            if (caseX % 2 == 1)
+            {
                 xOriginal = image.width() - 1 - xOriginal;
             }
 
-            newImage.pixel(x,y) = image.pixel(xOriginal, yOriginal);
+            newImage.pixel(x, y) = image.pixel(xOriginal, yOriginal);
         }
     }
 
     image = newImage;
+}
+
+void glitch(sil::Image &image)
+{
+    sil::Image imageRef = image;
+
+    for (int i{0}; i < 20; i++)
+    {
+        int largeur = random_int(20, 40);
+        int hauteur = random_int(5, 15);
+
+        int x1 = random_int(0, image.width() - largeur);
+        int y1 = random_int(0, image.height() - hauteur);
+
+        int x2 = random_int(0, image.width() - largeur);
+        int y2 = random_int(0, image.height() - hauteur);
+
+        for (int x{0}; x < largeur; x++)
+        {
+            for (int y{0}; y < hauteur; y++)
+            {
+                image.pixel(x1 + x, y1 + y) = imageRef.pixel(x2 + x, y2 + y);
+                image.pixel(x2 + x, y2 + y) = imageRef.pixel(x1 + x, y1 + y);
+            }
+        }
+
+        imageRef = image;
+    }
+}
+
+void tri_pixels(sil::Image &image)
+{
+    std::sort(image.pixels().begin(), image.pixels().end(), [](glm::vec3 const& color1, glm::vec3 const& color2)
+    {
+        float luminosite1 = color1.r + color1.g + color1.b;
+        float luminosite2 = color2.r + color2.g + color2.b;
+
+        return luminosite1 < luminosite2;
+    });
 }
 
 int main()
@@ -307,6 +352,6 @@ int main()
 
     // rotate(image).save("output/test.png");
     sil::Image image{"images/logo.png"};
-    mosaique_mirror(image);
-     image.save("output/test.png");
+    tri_pixels(image);
+    image.save("output/test.png");
 }
