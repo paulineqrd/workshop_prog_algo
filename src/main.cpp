@@ -3,6 +3,7 @@
 #include <cmath>
 #include <algorithm>
 #include <complex>
+#include <glm/gtx/matrix_transform_2d.hpp>
 
 void keep_green_only(sil::Image &image)
 {
@@ -42,7 +43,7 @@ void negatif(sil::Image &image)
 
 void gradient(sil::Image &image)
 {
-    for (float x{0}; x < image.width() - 1; x++)
+    for (float x{0}; x < image.width(); x++)
     {
         for (float y{0}; y < image.height(); y++)
         {
@@ -113,7 +114,9 @@ sil::Image rotate(sil::Image &image)
     {
         for (int y{0}; y < image.height(); y++)
         {
-            new_image.pixel(new_image.width() - (y + 1), new_image.height() - ((image.width() - (x + 1)) + 1)) = image.pixel(x, y);
+            new_image.pixel(
+                image.height() - 1 - y,
+                x) = image.pixel(x, y);
         }
     }
     return new_image;
@@ -137,7 +140,7 @@ void rgb_split(sil::Image &image)
                 image.pixel(x, y).r = imageRef.pixel(0, y).r;
             }
 
-            if (x + 30 < image.width() - 1)
+            if (x + 30 < image.width())
             {
                 image.pixel(x, y).b = imageRef.pixel(x + 30, y).b;
             }
@@ -169,13 +172,14 @@ void brightness(sil::Image &image)
 
 void disque(sil::Image &image)
 {
-    float rayon = image.width() * 20;
+    float rayon = 100.f;
 
     for (int x{0}; x < image.width(); x++)
     {
         for (int y{0}; y < image.height(); y++)
         {
-            if (std::pow((x - image.width() / 2), 2) + std::pow((y - image.height() / 2), 2) <= rayon)
+            float distance = std::pow(x - image.width() / 2.f, 2) + std::pow(y - image.height() / 2.f, 2);
+            if (distance <= rayon * rayon)
             {
                 image.pixel(x, y).r = 1.f;
                 image.pixel(x, y).g = 1.f;
@@ -187,17 +191,21 @@ void disque(sil::Image &image)
 
 void circle(sil::Image &image)
 {
-    float rayon = image.width() * 20;
-    float thickness = 1000.f;
+    float rayon = 100.f;
+    float thickness = 5.f;
     for (int x{0}; x < image.width(); x++)
     {
         for (int y{0}; y < image.height(); y++)
         {
-            if (std::pow((x - image.width() / 2), 2) + std::pow((y - image.height() / 2), 2) >= rayon - thickness && std::pow((x - image.width() / 2), 2) + std::pow((y - image.height() / 2), 2) <= rayon + thickness)
+            float distance = std::pow(x - image.width() / 2.f, 2) + std::pow(y - image.height() / 2.f, 2);
+
+            if (distance >= std::pow(rayon - thickness, 2) && distance <= std::pow(rayon + thickness, 2))
             {
-                image.pixel(x, y).r = 1.f;
-                image.pixel(x, y).g = 1.f;
-                image.pixel(x, y).b = 1.f;
+                {
+                    image.pixel(x, y).r = 1.f;
+                    image.pixel(x, y).g = 1.f;
+                    image.pixel(x, y).b = 1.f;
+                }
             }
         }
     }
@@ -205,7 +213,7 @@ void circle(sil::Image &image)
 
 void animation(sil::Image &image)
 {
-    float rayon = image.width() * 20;
+    float rayon = 100.f;
     for (int i{0}; i <= image.width(); i += 5)
     {
         sil::Image imageRef = image;
@@ -213,7 +221,7 @@ void animation(sil::Image &image)
         {
             for (int y{0}; y < image.height(); y++)
             {
-                if (std::pow((x - i), 2) + std::pow((y - image.height() / 2), 2) <= rayon)
+                if (std::pow(x - i, 2) + std::pow(y - image.height() / 2.f, 2) <= std::pow(rayon, 2))
                 {
                     imageRef.pixel(x, y).r = 1.f;
                     imageRef.pixel(x, y).g = 1.f;
@@ -221,7 +229,7 @@ void animation(sil::Image &image)
                 }
             }
         }
-        imageRef.save("output/animation/animation-" + std::to_string(i) + ".png");
+        imageRef.save("output/animations/animation-" + std::to_string(i) + ".png");
     }
 }
 
@@ -402,7 +410,7 @@ void fractale(sil::Image &image)
 
 void color_gradient(sil::Image &image)
 {
-    for (float x{0}; x < image.width() - 1; x++)
+    for (float x{0}; x < image.width(); x++)
     {
         for (float y{0}; y < image.height(); y++)
         {
@@ -426,7 +434,7 @@ void tramage(sil::Image &image)
         {0.4375, -0.0625, 0.3125, -0.1875},
     };
 
-    for (int x{0}; x < image.width() - 1; x++)
+    for (int x{0}; x < image.width(); x++)
     {
         for (int y{0}; y < image.height(); y++)
         {
@@ -445,21 +453,54 @@ void tramage(sil::Image &image)
     }
 }
 
+void box_blur(sil::Image &image)
+{
+    sil::Image newImage{image.width(), image.height()};
+
+    for (int x{0}; x < image.width(); x++)
+    {
+        for (int y{0}; y < image.height(); y++)
+        {
+            glm::vec3 color{0.f};
+            int count{0};
+
+            for (int i{-2}; i <= 2; i++)
+            {
+                for (int j{-2}; j <= 2; j++)
+                {
+                    int newX = x + i;
+                    int newY = y + j;
+
+                    if (newX >= 0 && newX < image.width() &&
+                        newY >= 0 && newY < image.height())
+                    {
+                        color += image.pixel(newX, newY);
+                        count++;
+                    }
+                }
+            }
+            newImage.pixel(x, y) = color / float(count);
+        }
+    }
+
+    image = newImage;
+}
+
 int main()
 {
     // sil::Image image{300 /*width*/, 200 /*height*/};
     // color_gradient(image);
     //  gradient(image);
 
-    // sil::Image image{500 /*width*/, 500 /*height*/};
-    // fractale(image);
+    sil::Image image{500 /*width*/, 500 /*height*/};
+    animation(image);
     // rosace(image);
 
-    // rotate(image).save("output/test.png");
     // sil::Image image{"images/logo.png"};
-    // random_tri(image);
+    // rotate(image).save("output/test.png");
+    // rotate(image);
 
-    sil::Image image{"images/photo.jpg"};
-    tramage(image);
-    image.save("output/test.png");
+    // sil::Image image{"images/photo.jpg"};
+    // tramage(image);
+    //image.save("output/test.png");
 }
