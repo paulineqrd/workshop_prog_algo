@@ -416,10 +416,39 @@ void color_gradient(sil::Image &image)
     // plus, faire beau dégradé ...
 }
 
+void tramage(sil::Image &image)
+{
+    const int bayer_n = 4;
+    float bayer_matrix_4x4[][bayer_n] = {
+        {-0.5, 0, -0.375, 0.125},
+        {0.25, -0.25, 0.375, -0.125},
+        {-0.3125, 0.1875, -0.4375, 0.0625},
+        {0.4375, -0.0625, 0.3125, -0.1875},
+    };
+
+    for (int x{0}; x < image.width() - 1; x++)
+    {
+        for (int y{0}; y < image.height(); y++)
+        {
+            float luminosite = (image.pixel(x, y).r + image.pixel(x, y).g + image.pixel(x, y).b) / 3.f;
+            float seuil = bayer_matrix_4x4[y % bayer_n][x % bayer_n];
+
+            if (luminosite > 0.5f + seuil)
+            {
+                image.pixel(x, y) = glm::vec3(1.f);
+            }
+            else
+            {
+                image.pixel(x, y) = glm::vec3(0.f);
+            }
+        }
+    }
+}
+
 int main()
 {
-    sil::Image image{300 /*width*/, 200 /*height*/};
-    color_gradient(image);
+    // sil::Image image{300 /*width*/, 200 /*height*/};
+    // color_gradient(image);
     //  gradient(image);
 
     // sil::Image image{500 /*width*/, 500 /*height*/};
@@ -429,5 +458,8 @@ int main()
     // rotate(image).save("output/test.png");
     // sil::Image image{"images/logo.png"};
     // random_tri(image);
+
+    sil::Image image{"images/photo.jpg"};
+    tramage(image);
     image.save("output/test.png");
 }
