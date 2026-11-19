@@ -3,7 +3,6 @@
 #include <cmath>
 #include <algorithm>
 #include <complex>
-#include <glm/gtx/matrix_transform_2d.hpp>
 
 void keep_green_only(sil::Image &image)
 {
@@ -122,7 +121,6 @@ sil::Image rotate(sil::Image &image)
     return new_image;
 }
 
-// A REVOIR
 void rgb_split(sil::Image &image)
 {
     sil::Image imageRef = image;
@@ -493,7 +491,7 @@ int main()
     //  gradient(image);
 
     sil::Image image{500 /*width*/, 500 /*height*/};
-    animation(image);
+    disque(image);
     // rosace(image);
 
     // sil::Image image{"images/logo.png"};
@@ -502,5 +500,5 @@ int main()
 
     // sil::Image image{"images/photo.jpg"};
     // tramage(image);
-    //image.save("output/test.png");
+    image.save("output/test.png");
 }
