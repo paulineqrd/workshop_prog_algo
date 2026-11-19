@@ -2,6 +2,7 @@
 #include "random.hpp"
 #include <cmath>
 #include <algorithm>
+#include <complex>
 
 void keep_green_only(sil::Image &image)
 {
@@ -374,16 +375,42 @@ void random_tri(sil::Image &image)
     }
 }
 
+void fractale(sil::Image &image)
+{
+
+    for (float x{0}; x < image.width(); x++)
+    {
+        for (float y{0}; y < image.height(); y++)
+        {
+            float re = x / image.width() * 3.f - 2.f;
+            float im = y / image.height() * 3.f - 1.5f;
+
+            std::complex<float> c{re, im};
+            std::complex<float> z{0};
+            int compteur{0};
+            while (std::abs(z) <= 2 && compteur < 100)
+            {
+                z = z * z + c;
+                compteur++;
+            }
+
+            int gris = compteur * 255 / 100;
+            image.pixel(x, y) = glm::vec3(gris / 255.f);
+        }
+    }
+}
+
 int main()
 {
     // sil::Image image{300 /*width*/, 200 /*height*/};
     //  gradient(image);
 
-    // sil::Image image{500 /*width*/, 500 /*height*/};
+    sil::Image image{500 /*width*/, 500 /*height*/};
+    fractale(image);
     // rosace(image);
 
     // rotate(image).save("output/test.png");
-    sil::Image image{"images/logo.png"};
-    random_tri(image);
+    // sil::Image image{"images/logo.png"};
+    // random_tri(image);
     image.save("output/test.png");
 }
