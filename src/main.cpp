@@ -3,7 +3,9 @@
 #include <cmath>
 #include <algorithm>
 #include <complex>
+#include <glm/gtx/matrix_transform_2d.hpp>
 
+// Exercice 1
 void keep_green_only(sil::Image &image)
 {
     for (glm::vec3 &color : image.pixels())
@@ -13,6 +15,7 @@ void keep_green_only(sil::Image &image)
     }
 }
 
+// Exercice 2
 void channels_swap(sil::Image &image)
 {
     for (glm::vec3 &color : image.pixels())
@@ -21,6 +24,7 @@ void channels_swap(sil::Image &image)
     }
 }
 
+// Exercice 3
 void black_and_white(sil::Image &image)
 {
     for (glm::vec3 &color : image.pixels())
@@ -32,6 +36,7 @@ void black_and_white(sil::Image &image)
     }
 }
 
+// Exercice 4
 void negatif(sil::Image &image)
 {
     for (glm::vec3 &color : image.pixels())
@@ -40,11 +45,12 @@ void negatif(sil::Image &image)
     }
 }
 
+// Exercice 5
 void gradient(sil::Image &image)
 {
-    for (float x{0}; x < image.width(); x++)
+    for (int x{0}; x < image.width(); x++)
     {
-        for (float y{0}; y < image.height(); y++)
+        for (int y{0}; y < image.height(); y++)
         {
             image.pixel(x, y).r = x / image.width();
             image.pixel(x, y).g = x / image.width();
@@ -53,6 +59,7 @@ void gradient(sil::Image &image)
     }
 }
 
+// Exercice 6
 void mirror(sil::Image &image)
 {
     sil::Image imageRef = image;
@@ -68,10 +75,9 @@ void mirror(sil::Image &image)
     }
 }
 
+// Exercice 7
 void noise(sil::Image &image)
 {
-    // nombre de boucle aléatoire
-    // x et y aléatoire
     int loop = random_int(image.width(), image.width() * image.height());
 
     for (int i = 0; i < loop; i++)
@@ -85,6 +91,7 @@ void noise(sil::Image &image)
     }
 }
 
+// Exercice 8
 sil::Image rotate(sil::Image &image)
 {
     sil::Image new_image{image.height(), image.width()};
@@ -121,6 +128,7 @@ sil::Image rotate(sil::Image &image)
     return new_image;
 }
 
+// Exercice 9
 void rgb_split(sil::Image &image)
 {
     sil::Image imageRef = image;
@@ -146,6 +154,7 @@ void rgb_split(sil::Image &image)
     }
 }
 
+// Exercice 10
 void brightness(sil::Image &image)
 {
 
@@ -168,6 +177,7 @@ void brightness(sil::Image &image)
     }
 }
 
+// Exercice 11
 void disque(sil::Image &image)
 {
     float rayon = 100.f;
@@ -187,6 +197,7 @@ void disque(sil::Image &image)
     }
 }
 
+// Exercice 12
 void circle(sil::Image &image)
 {
     float rayon = 100.f;
@@ -209,6 +220,7 @@ void circle(sil::Image &image)
     }
 }
 
+// Exercice 13
 void animation(sil::Image &image)
 {
     float rayon = 100.f;
@@ -231,6 +243,7 @@ void animation(sil::Image &image)
     }
 }
 
+// Exercice 14
 void rosace(sil::Image &image)
 {
     int rayon = 100;
@@ -267,6 +280,7 @@ void rosace(sil::Image &image)
     }
 }
 
+// Exercice 15
 void mosaique(sil::Image &image)
 {
     int nbDivision = 5;
@@ -283,6 +297,7 @@ void mosaique(sil::Image &image)
     image = newImage;
 }
 
+// Exercice 16
 void mosaique_mirror(sil::Image &image)
 {
     int nbDivision = 5;
@@ -310,6 +325,7 @@ void mosaique_mirror(sil::Image &image)
     image = newImage;
 }
 
+// Exercice 17
 void glitch(sil::Image &image)
 {
     sil::Image imageRef = image;
@@ -344,12 +360,14 @@ float brightness(glm::vec3 color)
     return brightness;
 }
 
+// Exercice 18
 void tri_pixels(sil::Image &image)
 {
     std::sort(image.pixels().begin(), image.pixels().end(), [](glm::vec3 const &color1, glm::vec3 const &color2)
               { return brightness(color1) < brightness(color2); });
 }
 
+// Exercice 19
 void tri_lignes(sil::Image &image)
 {
     for (int y{0}; y < image.height(); y++)
@@ -362,6 +380,7 @@ void tri_lignes(sil::Image &image)
     }
 }
 
+// Exercice 20
 void random_tri(sil::Image &image)
 {
     for (int i{0}; i < image.width(); i++)
@@ -381,6 +400,7 @@ void random_tri(sil::Image &image)
     }
 }
 
+// Exercice 21
 void fractale(sil::Image &image)
 {
 
@@ -406,22 +426,36 @@ void fractale(sil::Image &image)
     }
 }
 
+// Exercice 22
 void color_gradient(sil::Image &image)
 {
+    // Version sans glm::mix
+    // for (float x{0}; x < image.width(); x++)
+    // {
+    //     for (float y{0}; y < image.height(); y++)
+    //     {
+    //         float t = x / image.width();
+
+    //         image.pixel(x, y).r = 1.f - t;
+    //         image.pixel(x, y).g = t;
+    //     }
+    // }
+
+    glm::vec3 color1{1.f, 0.f, 0.f};
+    glm::vec3 color2{0.f, 1.f, 0.f};
+
     for (float x{0}; x < image.width(); x++)
     {
         for (float y{0}; y < image.height(); y++)
         {
             float t = x / image.width();
 
-            image.pixel(x, y).r = 1.f - t;
-            image.pixel(x, y).g = t;
+            image.pixel(x, y) = glm::mix(color1, color2, t);
         }
     }
-
-    // plus, faire beau dégradé ...
 }
 
+// Exercice 23
 void tramage(sil::Image &image)
 {
     const int bayer_n = 4;
@@ -436,10 +470,10 @@ void tramage(sil::Image &image)
     {
         for (int y{0}; y < image.height(); y++)
         {
-            float luminosite = (image.pixel(x, y).r + image.pixel(x, y).g + image.pixel(x, y).b) / 3.f;
+            float luminosity = (image.pixel(x, y).r + image.pixel(x, y).g + image.pixel(x, y).b) / 3.f;
             float seuil = bayer_matrix_4x4[y % bayer_n][x % bayer_n];
 
-            if (luminosite > 0.5f + seuil)
+            if (luminosity > 0.5f + seuil)
             {
                 image.pixel(x, y) = glm::vec3(1.f);
             }
@@ -451,6 +485,42 @@ void tramage(sil::Image &image)
     }
 }
 
+glm::vec2 rotated(glm::vec2 point, glm::vec2 center_of_rotation, float angle)
+{
+    return glm::vec2{glm::rotate(glm::mat3{1.f}, angle) * glm::vec3{point - center_of_rotation, 0.f}} + center_of_rotation;
+}
+
+// Exercice 24
+sil::Image vortex(sil::Image &image)
+{
+    sil::Image newImage{image.width(), image.height()};
+    for (int x{0}; x < newImage.width(); x++)
+    {
+        for (int y{0}; y < newImage.height(); y++)
+        {
+
+            glm::vec2 point{x, y};
+            glm::vec2 center{image.width() / 2.f, image.height() / 2.f};
+
+            float distance = glm::distance(point, center);
+            float angle = distance * 0.1f;
+            glm::vec2 newPoint = rotated(point, center, angle);
+
+            int newX = newPoint.x;
+            int newY = newPoint.y;
+
+            if (newX >= 0 && newX < newImage.width() &&
+                newY >= 0 && newY < newImage.height())
+            {
+                newImage.pixel(x, y) = image.pixel(newX, newY);
+            }
+        }
+    }
+
+    return newImage;
+}
+
+// Exercice 25
 void box_blur(sil::Image &image)
 {
     sil::Image newImage{image.width(), image.height()};
@@ -490,15 +560,15 @@ int main()
     // color_gradient(image);
     //  gradient(image);
 
-    sil::Image image{500 /*width*/, 500 /*height*/};
-    disque(image);
+    // sil::Image image{500 /*width*/, 500 /*height*/};
+    // color_gradient(image);
     // rosace(image);
 
-    // sil::Image image{"images/logo.png"};
-    // rotate(image).save("output/test.png");
-    // rotate(image);
+    sil::Image image{"images/logo.png"};
+    vortex(image).save("output/test.png");
+    //vortex(image);
 
     // sil::Image image{"images/photo.jpg"};
     // tramage(image);
-    image.save("output/test.png");
+    //image.save("output/test.png");
 }
