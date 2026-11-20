@@ -247,9 +247,9 @@ Nous obtenons :
 
 ## ★★★★ Exercice 25 — Convolutions
 
-| Image avant | Image après |
+| Image avant | Box Blur |
 |:---:|:---:|
-| ![Avant](images/logo.png) | ![Après](output/box_blur.png) |
+| ![Avant](images/logo.png) | ![Box Blur](output/box_blur.png) |
 
 | Sharpen | Outline | Emboss |
 |:---:|:---:|:---:|
