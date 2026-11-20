@@ -264,5 +264,5 @@ if (newX >= 0 && newX < image.width() && newY >= 0 && newY < image.height())
 ```
 
 ---
-
-
+## Autre : 
+J'ai réalisé à quel point l'utilisation de Git est importante, même pour un projet personnel, suite à un problème avec mon ordinateur qui m'a forcé à travailler sur un autre.
