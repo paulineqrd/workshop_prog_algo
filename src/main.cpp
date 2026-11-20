@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <complex>
 #include <glm/gtx/matrix_transform_2d.hpp>
+#include <vector>
 
 // Exercice 1
 void keep_green_only(sil::Image &image)
@@ -37,7 +38,7 @@ void black_and_white(sil::Image &image)
 }
 
 // Exercice 4
-void negatif(sil::Image &image)
+void negative(sil::Image &image)
 {
     for (glm::vec3 &color : image.pixels())
     {
@@ -52,9 +53,8 @@ void gradient(sil::Image &image)
     {
         for (int y{0}; y < image.height(); y++)
         {
-            image.pixel(x, y).r = x / image.width();
-            image.pixel(x, y).g = x / image.width();
-            image.pixel(x, y).b = x / image.width();
+            float t = float(x) / image.width();
+            image.pixel(x, y) = glm::vec3(t);
         }
     }
 }
@@ -67,9 +67,6 @@ void mirror(sil::Image &image)
     {
         for (int y{0}; y < image.height(); y++)
         {
-            // Essai mirror
-            // image.pixel(x, y) = image.pixel(image.width() - (x + 1), y);
-
             image.pixel(x, y) = imageRef.pixel(imageRef.width() - (x + 1), y);
         }
     }
@@ -120,9 +117,7 @@ sil::Image rotate(sil::Image &image)
     {
         for (int y{0}; y < image.height(); y++)
         {
-            new_image.pixel(
-                image.height() - 1 - y,
-                x) = image.pixel(x, y);
+            new_image.pixel(image.height() - 1 - y, x) = image.pixel(x, y);
         }
     }
     return new_image;
@@ -178,7 +173,7 @@ void brightness(sil::Image &image)
 }
 
 // Exercice 11
-void disque(sil::Image &image)
+void disk(sil::Image &image)
 {
     float rayon = 100.f;
 
@@ -281,7 +276,7 @@ void rosace(sil::Image &image)
 }
 
 // Exercice 15
-void mosaique(sil::Image &image)
+void mosaic(sil::Image &image)
 {
     int nbDivision = 5;
     sil::Image newImage{image.width() * nbDivision, image.height() * nbDivision};
@@ -298,7 +293,7 @@ void mosaique(sil::Image &image)
 }
 
 // Exercice 16
-void mosaique_mirror(sil::Image &image)
+void mosaic_mirror(sil::Image &image)
 {
     int nbDivision = 5;
     sil::Image newImage{image.width() * nbDivision, image.height() * nbDivision};
@@ -361,18 +356,17 @@ float brightness(glm::vec3 color)
 }
 
 // Exercice 18
-void tri_pixels(sil::Image &image)
+void pixel_sorting(sil::Image &image)
 {
     std::sort(image.pixels().begin(), image.pixels().end(), [](glm::vec3 const &color1, glm::vec3 const &color2)
               { return brightness(color1) < brightness(color2); });
 }
 
 // Exercice 19
-void tri_lignes(sil::Image &image)
+void rows_sorting(sil::Image &image)
 {
     for (int y{0}; y < image.height(); y++)
     {
-
         auto begin = image.pixels().begin() + y * image.width();
         auto end = begin + image.width();
         std::sort(begin, end, [](glm::vec3 const &color1, glm::vec3 const &color2)
@@ -381,7 +375,7 @@ void tri_lignes(sil::Image &image)
 }
 
 // Exercice 20
-void random_tri(sil::Image &image)
+void random_sorting(sil::Image &image)
 {
     for (int i{0}; i < image.width(); i++)
     {
@@ -401,9 +395,8 @@ void random_tri(sil::Image &image)
 }
 
 // Exercice 21
-void fractale(sil::Image &image)
+void mandelbrot_fractal(sil::Image &image)
 {
-
     for (float x{0}; x < image.width(); x++)
     {
         for (float y{0}; y < image.height(); y++)
@@ -414,6 +407,7 @@ void fractale(sil::Image &image)
             std::complex<float> c{re, im};
             std::complex<float> z{0};
             int compteur{0};
+
             while (std::abs(z) <= 2 && compteur < 100)
             {
                 z = z * z + c;
@@ -449,14 +443,13 @@ void color_gradient(sil::Image &image)
         for (float y{0}; y < image.height(); y++)
         {
             float t = x / image.width();
-
             image.pixel(x, y) = glm::mix(color1, color2, t);
         }
     }
 }
 
 // Exercice 23
-void tramage(sil::Image &image)
+void halftone(sil::Image &image)
 {
     const int bayer_n = 4;
     float bayer_matrix_4x4[][bayer_n] = {
@@ -485,12 +478,12 @@ void tramage(sil::Image &image)
     }
 }
 
+// Exercice 24
 glm::vec2 rotated(glm::vec2 point, glm::vec2 center_of_rotation, float angle)
 {
     return glm::vec2{glm::rotate(glm::mat3{1.f}, angle) * glm::vec3{point - center_of_rotation, 0.f}} + center_of_rotation;
 }
 
-// Exercice 24
 sil::Image vortex(sil::Image &image)
 {
     sil::Image newImage{image.width(), image.height()};
@@ -509,8 +502,7 @@ sil::Image vortex(sil::Image &image)
             int newX = newPoint.x;
             int newY = newPoint.y;
 
-            if (newX >= 0 && newX < newImage.width() &&
-                newY >= 0 && newY < newImage.height())
+            if (newX >= 0 && newX < newImage.width() && newY >= 0 && newY < newImage.height())
             {
                 newImage.pixel(x, y) = image.pixel(newX, newY);
             }
@@ -521,54 +513,116 @@ sil::Image vortex(sil::Image &image)
 }
 
 // Exercice 25
-void box_blur(sil::Image &image)
+void convolution(sil::Image &image, std::vector<std::vector<float>> kernel)
 {
     sil::Image newImage{image.width(), image.height()};
 
-    for (int x{0}; x < image.width(); x++)
+    int kernelSize = kernel.size();
+    int offset = kernelSize / 2;
+
+    for (int x = 0; x < image.width(); x++)
     {
-        for (int y{0}; y < image.height(); y++)
+        for (int y = 0; y < image.height(); y++)
         {
             glm::vec3 color{0.f};
-            int count{0};
+            float divisor = 0.f;
 
-            for (int i{-2}; i <= 2; i++)
+            for (int i = 0; i < kernelSize; i++)
             {
-                for (int j{-2}; j <= 2; j++)
+                for (int j = 0; j < kernelSize; j++)
                 {
-                    int newX = x + i;
-                    int newY = y + j;
+                    int newX = x + i - offset;
+                    int newY = y + j - offset;
 
-                    if (newX >= 0 && newX < image.width() &&
-                        newY >= 0 && newY < image.height())
+                    if (newX >= 0 && newX < image.width() && newY >= 0 && newY < image.height())
                     {
-                        color += image.pixel(newX, newY);
-                        count++;
+                        color += image.pixel(newX, newY) * kernel[i][j];
                     }
+                    divisor += kernel[i][j];
                 }
             }
-            newImage.pixel(x, y) = color / float(count);
+
+            if (divisor != 0.f)
+            {
+                color = color / divisor;
+            }
+
+            newImage.pixel(x, y) = glm::clamp(color, glm::vec3(0.f), glm::vec3(1.f));
         }
     }
 
     image = newImage;
 }
 
+void box_blur(sil::Image &image)
+{
+    convolution(image, {{1, 1, 1},
+                        {1, 1, 1},
+                        {1, 1, 1}});
+}
+
+void sharpen(sil::Image &image)
+{
+    convolution(image, {{0, -1, 0},
+                        {-1, 5, -1},
+                        {0, -1, 0}});
+}
+
+void outline(sil::Image &image)
+{
+    convolution(image, {{-1, -1, -1},
+                        {-1, 8, -1},
+                        {-1, -1, -1}});
+}
+
+void emboss(sil::Image &image)
+{
+    convolution(image, {{-2, -1, 0},
+                        {-1, 1, 1},
+                        {0, 1, 2}});
+}
+
 int main()
 {
+    // EXERCICES NOUVELLE IMAGE RECTANGULAIRE
     // sil::Image image{300 /*width*/, 200 /*height*/};
+    // gradient(image);
     // color_gradient(image);
-    //  gradient(image);
 
+    // EXERCICE NOUVELLE IMAGE CARRE
     // sil::Image image{500 /*width*/, 500 /*height*/};
-    // color_gradient(image);
+    // disk(image);
+    // circle(image);
+    // animation(image);
     // rosace(image);
+    // mandelbrot_fractal(image);
 
-    sil::Image image{"images/logo.png"};
-    vortex(image).save("output/test.png");
-    //vortex(image);
-
+    // EXERCICES AVEC PHOTO :
     // sil::Image image{"images/photo.jpg"};
-    // tramage(image);
-    //image.save("output/test.png");
+    // brightness(image);
+    // halftone(image);
+
+    // EXERCICES AVEC LOGO :
+    sil::Image image{"images/logo.png"};
+    // keep_green_only(image);
+    // channels_swap(image);
+    // black_and_white(image);
+    // negative(image);
+    // mirror(image);
+    // noise(image);
+    // rotate(image);
+    // rgb_split(image);
+    // mosaic(image);
+    // mosaic_mirror(image);
+    // glitch(image);
+    // pixel_sorting(image);
+    // rows_sorting(image);
+    // random_sorting(image);
+    // vortex(image).save("output/test.png");
+    // box_blur(image);
+    // sharpen(image);
+    // outline(image);
+    emboss(image);
+
+    image.save("output/test.png");
 }
